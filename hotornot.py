@@ -57,20 +57,22 @@ def handleJsonError(json_data) :
     }
     model = TextGenerationModel.from_pretrained("text-bison")
     response = model.predict( """You are a JSON correcting AI agent. You will be given input of text which is not a well formed JSON. You will have to generate an output correcting the format errors of the input.
+                              Make sure the ouutput is correctly formatted JSON.
 
             input: { 
-                "category" : "Medium", 
-                "gender" : "Female"
-                "age" : "25-30"
-                "facial_weight" : "Right weight
-                "rationale" : "The person is labelled medium because though the person has good facial symmetry, his nose is slightly crooked and no sharp features make him less attractive"
+                "key1" : "value1", 
+                "key2" : "value2"
+                "key3" : "value3"
+                "key4" : "value4
+                "key5" : "value5"
                 }
-            output: { 
-                "category" : "Medium", 
-                "gender" : "Female",
-                "age" : "25-30",
-                "facial_weight" : "Right weight",
-                "rationale" : "The person is labelled medium because though the person has good facial symmetry, his nose is slightly crooked and no sharp features make him less attractive"
+            output: 
+            { 
+                "key1" : "value1", 
+                "key2" : "value2",
+                "key3" : "value3",
+                "key4" : "value4",
+                "key5" : "value5"
                 }
 
             input:""" + json_data + "output :", **parameters)
@@ -85,7 +87,12 @@ def parse_ai_response(response, promptType : str) :
         print(f"Error decoding JSON: {e}")
         cleaned_text = response.strip()
         json_data = handleJsonError(json_data=cleaned_text)
-        json_data = json.loads(json_data)
+        print("=======Printing JSON data======")
+        print(str(json_data))
+        if json_data is None:
+            print("JSON data is None")
+        cleaned_text = json_data.replace("```json\n", "").replace("```","").replace("```json\n{","").replace("JSON","").replace("\n","").strip()
+        json_data = json.loads(cleaned_text)
         
     if promptType == promptTypeConstants.PLAIN_PROMPT :
         array_from_json = [
@@ -286,9 +293,10 @@ def generate_response(prompt, video, promptId, model, client):
 
 def read_input_data(file_path):
     data = []
-    with open(file_path, 'r', newline='') as file:
+    with open(file_path, 'r', newline='', encoding='utf-8-sig') as file:
         csv_reader = csv.DictReader(file)
         for row in csv_reader:
+            print(row)
             file_name = row['file_name']
             label = row['label']
             reasoning = row['reasoning']
@@ -376,31 +384,34 @@ def main():
     #Generating results for promptId - 3 | Model - Gemini
     # generate_and_save_predictions(input_data,output_file_name,3,constants.GEMINI_MODEL, client=client)
 
-    # #Generating results for promptId - 3.1 | Model - Gemini
+    #Generating results for promptId - 3.1 | Model - Gemini
     # generate_and_save_predictions(input_data,output_file_name,3.1,constants.GEMINI_MODEL, client=client)
 
-    # #Generating results for promptId - 3.2 | Model - Gemini
+    #Generating results for promptId - 3.2 | Model - Gemini
     # generate_and_save_predictions(input_data,output_file_name,3.2,constants.GEMINI_MODEL, client=client)
 
-    # #Generating results for promptId - 4 | Model - Gemini
+    #Generating results for promptId - 4 | Model - Gemini
     # generate_and_save_predictions(input_data,output_file_name,4,constants.GEMINI_MODEL, client=client)
 
-    # #Generating results for promptId - 4.1 | Model - Gemini
+    #Generating results for promptId - 4.1 | Model - Gemini
     # generate_and_save_predictions(input_data,output_file_name,4.1,constants.GEMINI_MODEL, client=client)
 
     # #Generating results for promptId - 4.2 | Model - Gemini
     # generate_and_save_predictions(input_data,output_file_name,4.2,constants.GEMINI_MODEL, client=client)
 
-    # #Generating results for promptId - 5 | Model - Gemini
-    # generate_and_save_predictions(input_data,output_file_name,5,constants.GEMINI_MODEL, client=client)
+    #Generating results for promptId - 5 | Model - Gemini
+    generate_and_save_predictions(input_data,output_file_name,5,constants.GEMINI_MODEL, client=client)
 
     #Generating results for promptId - 5.1 | Model - Gemini
-    # generate_and_save_predictions(input_data,output_file_name,5.1,constants.GEMINI_MODEL, client=client)
+    generate_and_save_predictions(input_data,output_file_name,5.1,constants.GEMINI_MODEL, client=client)
 
     #Generating results for promptId - 5.2 | Model - Gemini
     # generate_and_save_predictions(input_data,output_file_name,5.3,constants.GEMINI_MODEL, client=client)
 
     # #Generating results for promptId - 6 | Model - Gemini
+    generate_and_save_predictions(input_data,output_file_name,6,constants.GEMINI_MODEL, client=client)
+
+    # #Generating results for promptId - 6.1 | Model - Gemini
     generate_and_save_predictions(input_data,output_file_name,6.1,constants.GEMINI_MODEL, client=client)
 
     
